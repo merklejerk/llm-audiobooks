@@ -80,9 +80,9 @@ You should always do the following:
 3. After the chapter, prefix the progress status with `[progress]`. The progress status should include:
     - A line stating: "I just wrote Chapter X", where "X" is the chapter number.
     - An estimated number of chapters remaining.
-    - a brief summary of the chapter.
-    - A brief indication of where we are in the greater story.
-    - A brief suggestion for where to go next in the story.
+    - a compact summary of the chapter, including any significant events or character developments.
+    - A brief indication of where we are in the greater story, including plot points covered and yet to be resolved.
+    - A brief suggestion for where to go in the next chapter.
 """,
         input=prompt,
         max_output_tokens=4000,
@@ -100,7 +100,7 @@ def generate_audio(book_id, chapter_number, chapter_content):
     
     audio_file_path = chapters_dir / f"{book_id}_chapter_{chapter_number}.mp3"
     
-    with openai.audio.speech.with_streaming_response.method.create(
+    with openai.audio.speech.with_streaming_response.create(
         model=TTS_MODEL,
         voice=TTS_VOICE,
         input=chapter_content,
