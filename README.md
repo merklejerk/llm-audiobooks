@@ -1,10 +1,13 @@
-# Audiobook Generator
+# LLM Audiobook Generator
+
+> ⚠️ &nbsp;&nbsp; This project was mostly vibe coded.<br /> 🍿 &nbsp;&nbsp; For entertainment purposes only.
+
 
 A CLI tool that generates audiobooks using OpenAI APIs.
 
 ## Installation
 
-This is a python project (`pyproject.toml`). Adapt commands with your chosen package manager.
+This is a python project (`pyproject.toml`), developed with [`poetry`](https://python-poetry.org/), but probably works fine with [`uv`](https://github.com/astral-sh/uv) and possibly others.
 
 ```bash
 poetry install
@@ -45,7 +48,7 @@ The book ID is inferred from the spec filename (the name before the first period
 
 ### Spec File Format
 
-The spec file should contain a detailed description of the book, including:
+The spec file is a markdown file containing a detailed description of the book, including things like:
 - Story outline
 - Main characters
 - Setting
