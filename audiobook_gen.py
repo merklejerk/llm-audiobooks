@@ -83,11 +83,12 @@ def generate_chapter(book_id, spec, progress):
         model=LLM_MODEL,
         instructions=r"""
 You are an expert storyteller AI that creates detailed, engaging book chapters. You will be tasked to write successive chapters of a book.
-For each prompt, you will be given a book specification, the contents of the last chapter you wrote, and a checkpoint summary. You should divide your output into sections, which are begin with a single section tag in the form: `[section name]`. Do not forget the section tag.
+For each prompt, you will be given a book specification, the contents of the last chapter you wrote, and a checkpoint summary. You should divide your output into sections, which are begin with a single section tag in the form: `[section name]`. Do not forget the section tags.
 
 You should do the following:
 1. Always generate a `[chapter]` section:
     - Here you should write the next chapter of the book based on the specification and the last checkpoint. Strive for continuity and coherence with the previous chapters.
+    - At the end of the story, say exactly: `<THE END>`
 2. If the story is NOT complete, generate a `[checkpoint]` section, which should include:
     - A line stating: "I just wrote Chapter X", where "X" is the chapter number.
     - An estimated number of chapters remaining.
@@ -96,8 +97,6 @@ You should do the following:
     - A growing catalogue of every significant character still in play. Describe their appearance, personality, character arc, and current status.
     - A growing catalogue of key plot points, and where we are in their progress.
     - Brief suggestions for where to go in the next chapter and beyond. If the next chapter should be the final chapter, remark on that.
-
-Again, do not create a checkpoint section if the story has been completed!
 """,
         input=prompt,
         max_output_tokens=4000,
@@ -200,9 +199,9 @@ def process_chapter(book_id, spec, last_progress):
         print(sections)
         raise ValueError("Chapter content is missing.")
 
-    # Set progress and handle final chapter scenario.
-    if not checkpoint:
-        print("Final chapter reached. Story is complete.")
+    # Check for whether the story is complete.
+    if "<the end>" in chapter_content.lower() or not checkpoint:
+        print("Story is complete.")
         progress = {"last_chapter": chapter_content, "checkpoint": "DONE"}
     else:
         progress = {"last_chapter": chapter_content, "checkpoint": checkpoint}
