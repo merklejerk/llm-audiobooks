@@ -202,7 +202,7 @@ def process_chapter(book_id, spec, last_progress):
     # Set progress and handle final chapter scenario.
     if not checkpoint:
         print("Final chapter reached. Story is complete.")
-        progress = {"last_chapter": chapter_content, "checkpoint": ""}
+        progress = {"last_chapter": chapter_content, "checkpoint": "DONE"}
     else:
         progress = {"last_chapter": chapter_content, "checkpoint": checkpoint}
         print("\n--- checkpoint ---")
@@ -240,12 +240,15 @@ def main():
     spec = load_spec(args.spec_file)
     progress = load_progress(book_id)
 
-    # Loop to generate the specified number of chapters.
-    for _ in range(args.num_chapters):
-        result = process_chapter(book_id, spec, progress)
-        if result is None:
-            break
-        progress = result
+    if progress["checkpoint"] == "DONE":
+        print("Story is already complete. No further chapters will be generated.")
+    else:
+        # Loop to generate the specified number of chapters.
+        for _ in range(args.num_chapters):
+            result = process_chapter(book_id, spec, progress)
+            if result is None:
+                break
+            progress = result
 
     # If concatenation flag is set, combine generated chapter audio files.
     if args.concat_audio:
