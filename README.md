@@ -2,10 +2,9 @@
 
 > ⚠️ &nbsp;&nbsp; This project was mostly vibe coded.<br /> 🍿 &nbsp;&nbsp; For entertainment purposes only.
 
-
 A CLI tool that generates audiobooks using OpenAI APIs.
 
-## Installation
+## 🚀 &nbsp; Installation
 
 This is a python project (`pyproject.toml`), developed with [`poetry`](https://python-poetry.org/), but probably works fine with [`uv`](https://github.com/astral-sh/uv) and possibly others.
 
@@ -13,7 +12,7 @@ This is a python project (`pyproject.toml`), developed with [`poetry`](https://p
 poetry install
 ```
 
-## Configuration
+## ⚙️ &nbsp; Configuration
 
 Create a `.env` file in the project root directory with the following variables (modify the values accordingly):
 
@@ -29,7 +28,7 @@ OPENAI_TTS_VOICE=nova
 - `OPENAI_TTS_MODEL`: The OpenAI model to use for text-to-speech (default: tts-1)
 - `OPENAI_TTS_VOICE`: The voice to use for text-to-speech (default: nova)
 
-## Usage
+## 🛠️ &nbsp; Usage
 
 ```bash
 poetry run python audiobook_gen.py <spec_file> [--num-chapters N] [--concat-audio output_file]
@@ -55,8 +54,13 @@ The spec file is a markdown file containing a detailed description of the book, 
 - Style and tone
 - Target audience
 
-## Output
+## 📤 &nbsp; Output
 
 - Chapter content is saved to `chapters/<book_id>_chapter_<number>.md`
 - Audio files are saved to `chapters/<book_id>_chapter_<number>.wav`
 - Progress markers are saved to `progress/<book_id>.json`
+
+## 🐛 &nbsp; Issues
+
+OpenAI's Text-To-Speech APIs seem to occasionally glitch out and repeat itself or introduce long silences in the produced output. Not sure if there's a more reliable way to use them or if we're better off just switching to a less convincing but more reliable TTS like Google's.
+
