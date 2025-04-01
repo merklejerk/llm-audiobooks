@@ -4,3 +4,7 @@
 chapters/
 progress/
 __pycache__/
+*.ogg
+*.wav
+*.mp3
+*.aac
