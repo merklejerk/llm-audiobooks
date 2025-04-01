@@ -17,16 +17,16 @@ LLM_MODEL = os.environ.get("OPENAI_LLM_MODEL", "gpt-4")
 TTS_MODEL = os.environ.get("OPENAI_TTS_MODEL", "tts-1")
 TTS_VOICE = os.environ.get("OPENAI_TTS_VOICE", "nova")
 
-def load_progress_state(book_id):
-    """Load the progress state for a specific book from disk."""
+def load_progress_checkpoint(book_id):
+    """Load the progress checkpoint for a specific book from disk."""
     progress_file = Path(f"progress/{book_id}.json")
     if progress_file.exists():
         with open(progress_file, "r") as f:
             return json.load(f)
     return r"""This is the start of the story. We need to write chapter 1."""
 
-def save_progress_state(book_id, progress):
-    """Save the progress state to disk."""
+def save_progress_checkpoint(book_id, progress):
+    """Save the progress checkpoint to disk."""
     progress_dir = Path("progress")
     progress_dir.mkdir(exist_ok=True)
     
@@ -55,34 +55,35 @@ def extract_chapter_content(sections):
     """Extract chapter content from tagged sections."""
     return sections.get("chapter")
 
-def extract_progress_state(sections):
-    """Extract progress state from tagged sections."""
+def extract_progress_checkpoint(sections):
+    """Extract progress checkpoint from tagged sections."""
     return sections.get("progress") or None
 
-def generate_chapter(book_id, spec, progress_state):
+def generate_chapter(book_id, spec, progress_checkpoint):
     """Generate the next chapter using OpenAI API."""
     prompt = f"""
 BOOK SPECIFICATION:
 {spec}
 
-PROGRESS STATUS FROM LAST CHAPTER:
-{progress_state}
+LAST PROGRESS CHECKPOINT:
+{progress_checkpoint}
 """
     response = openai.responses.create(
         model=LLM_MODEL,
         instructions=r"""
-You are an expert storyteller AI that creates detailed, engaging book chapters.
-For each prompt, you will be given a book specification and the progress status from the last chapter you wrote.
+You are an expert storyteller AI that creates detailed, engaging book chapters. You will be tasked to write successive chapters of a book.
+For each prompt, you will be given a book specification and a progress checkpoint from the last chapter you wrote.
 
 You should always do the following:
-1. Write the next chapter of the book based on the specification and the last progress status.
+1. Write the next chapter of the book based on the specification and the last progress checkpoint. Strive for continuity and coherence with the previous chapters.
 2. Begin the chapter section with the tag `[chapter]`. Do not use a closing tag; the start of any new tag (e.g. [progress]) marks its end.
-3. After the chapter, prefix the progress status with `[progress]`. The progress status should include:
+3. After the chapter, prefix the progress checkpoint with `[progress]`. The progress checkpoint should include:
     - A line stating: "I just wrote Chapter X", where "X" is the chapter number.
     - An estimated number of chapters remaining.
-    - a compact summary of the chapter, including any significant events or character developments.
-    - A brief indication of where we are in the greater story, including plot points covered and yet to be resolved.
-    - A brief suggestion for where to go in the next chapter.
+    - How we got to this point in the story from the previous chapter.
+    - a summary of the chapter, including any significant events and character developments. Name characters directly.
+    - An indication of where we are in the greater story, character arcs, and unresolved plot points.
+    - A suggestion for where to go in the next chapter and beyond.
 """,
         input=prompt,
         max_output_tokens=4000,
@@ -141,31 +142,31 @@ def main():
     # Step 1: Load book specification
     spec = load_spec(args.spec_file)
     
-    # Step 2: Load progress state
-    progress_state = load_progress_state(book_id)
+    # Step 2: Load progress checkpoint
+    progress_checkpoint = load_progress_checkpoint(book_id)
     
     # Step 3 & 4: Generate next chapter using LLM
-    response = generate_chapter(book_id, spec, progress_state)
+    response = generate_chapter(book_id, spec, progress_checkpoint)
     
-    # Extract chapter content and progress state
+    # Extract chapter content and progress checkpoint
     sections = extract_sections(response)
     chapter_content = extract_chapter_content(sections)
-    new_progress_state = extract_progress_state(sections)
+    new_progress_checkpoint = extract_progress_checkpoint(sections)
     
-    if not chapter_content or not new_progress_state:
-        print("Error: Could not extract chapter content or progress state from response.")
+    if not chapter_content or not new_progress_checkpoint:
+        print("Error: Could not extract chapter content or progress checkpoint from response.")
         print(sections)
         return
     
-    # Step 5: Save progress state
-    save_progress_state(book_id, new_progress_state)
+    # Step 5: Save progress checkpoint
+    save_progress_checkpoint(book_id, new_progress_checkpoint)
     
     # Step 6: Print chapter content
     print("\n=== New Chapter ===\n")
     print(chapter_content)
     # Added progress printing after chapter content
-    print("\n--- Progress state ---")
-    print(f"Progress: {new_progress_state}")
+    print("\n--- Progress checkpoint ---")
+    print(f"Progress: {new_progress_checkpoint}")
     print("\n==================\n")
     
     # Determine chapter number based on existing files
@@ -180,7 +181,7 @@ def main():
     
     print(f"Chapter saved to: {text_file}")
     print(f"Audio saved to: {audio_file}")
-    print(f"Progress: {new_progress_state}")
+    print(f"Progress: {new_progress_checkpoint}")
 
 if __name__ == "__main__":
     main()
