@@ -148,16 +148,40 @@ def extract_book_id_from_spec_file(spec_file_path):
 
 # New helper function to concatenate audio files using ffmpeg-python
 def concat_audio_files(book_id, output_file):
+    """
+    Concatenate all chapter audio files into a single file, with silence filtering.
+    
+    Args:
+        book_id: The identifier for the book
+        output_file: Path to save the concatenated audio
+        silence_threshold: The threshold (in dB) below which audio is considered silence (default: -50dB)
+        silence_duration: Minimum duration of silence to remove (in seconds) (default: 1s)
+    """
     chapters_dir = Path("chapters")
     # List and sort audio files based on chapter number.
     files = sorted(chapters_dir.glob(f"{book_id}_chapter_*.wav"), key=lambda f: int(re.search(r"chapter_(\d+)\.wav", f.name).group(1)))
     if not files:
         print("No chapter audio files found to concatenate.")
         return
-    # Create ffmpeg inputs for each audio file.
-    inputs = [ffmpeg.input(str(audio_path)) for audio_path in files]
-    # Concatenate all audio streams into one output file.
-    joined = ffmpeg.concat(*inputs, v=0, a=1).output(output_file)
+    
+    # Create ffmpeg inputs for each audio file with silence filtering
+    inputs = [
+        ffmpeg.input(str(audio_path), err_detect='ignore_err') for audio_path in files
+    ]
+    
+    # Concatenate all filtered audio streams into one output file
+    joined = ffmpeg.concat(*inputs, v=0, a=1)\
+            .filter('silenceremove', 
+                detection='rms',
+                start_periods=1,
+                stop_periods=-1,
+                start_threshold='-30dB',
+                stop_threshold='-30dB',
+                stop_duration=1,
+            ).output(output_file)\
+            .overwrite_output()
+    
+    # Run the command
     ffmpeg.run(joined)
     print(f"Concatenated audio file saved to: {output_file}")
 

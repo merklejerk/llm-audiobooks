@@ -64,5 +64,5 @@ The spec file is a markdown file containing a detailed description of the book, 
 
 ## 🐛 &nbsp; Issues
 
-OpenAI's Text-To-Speech APIs seem to occasionally glitch out and repeat itself or introduce long silences in the produced output. Not sure if there's a more reliable way to use them or if we're better off just switching to a less convincing but more reliable TTS like Google's.
+OpenAI's Text-To-Speech APIs seem to occasionally glitch out and repeat itself or introduce long silences in the produced output. Not sure if there's a more reliable way to use them or if we're better off just switching to a less convincing but more reliable TTS like Google's. For the moment, we apply an ffmpeg filter to trim out silences in the concatenated output.
 
