@@ -34,6 +34,8 @@ OPENAI_TTS_VOICE=nova
 poetry run python audiobook_gen.py <spec_file> [--num-chapters N] [--concat-audio output_file]
 ```
 
+This command generates the next chapter(s) of an audiobook based on the provided specification file. The tool automatically picks up where it left off by using progress saved from previous runs. It uses OpenAI's APIs to create text content for the chapters and convert them into audio files. Optionally, all audio files can be concatenated into a single file.
+
 ### Parameters
 
 - `spec_file`: Path to the specification file that describes the story, style, etc.
@@ -42,8 +44,8 @@ The book ID is inferred from the spec filename (the name before the first period
 
 ### Optional Arguments
 
-- `--num-chapters` or `-n`: Number of successive chapters to generate (default: 1).
-- `--concat-audio` or `-c`: Specifies an output file to concatenate all generated chapter audio files.
+- `--num-chapters` or `-n`: Number of successive chapters to generate (default: 1). Each chapter's text and audio will be created sequentially, continuing from the last saved progress.
+- `--concat-audio` or `-c`: Specifies an output file to concatenate all generated chapter audio files into a single audio file.
 
 ### Spec File Format
 
