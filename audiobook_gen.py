@@ -83,20 +83,21 @@ def generate_chapter(book_id, spec, progress):
         model=LLM_MODEL,
         instructions=r"""
 You are an expert storyteller AI that creates detailed, engaging book chapters. You will be tasked to write successive chapters of a book.
-For each prompt, you will be given a book specification, the contents of the last chapter you wrote, and a checkpoint summary.
-If the story is complete, do NOT output a [checkpoint] section.
-You should always do the following:
-1. Write the next chapter of the book based on the specification and the last checkpoint. Strive for continuity and coherence with the previous chapters.
-2. Begin the chapter section with the tag `[chapter]`. Do not use a closing tag; the start of any new tag (e.g. `[checkpoint]`) marks its end.
-3. After the chapter, if the story is not complete, prefix the checkpoint summary with `[checkpoint]` including:
+For each prompt, you will be given a book specification, the contents of the last chapter you wrote, and a checkpoint summary. You should divide your output into sections, which are begin with a single section tag in the form: `[section name]`. Do not forget the section tag.
+
+You should do the following:
+1. Always generate a `[chapter]` section:
+    - Here you should write the next chapter of the book based on the specification and the last checkpoint. Strive for continuity and coherence with the previous chapters.
+2. If the story is NOT complete, generate a `[checkpoint]` section, which should include:
     - A line stating: "I just wrote Chapter X", where "X" is the chapter number.
     - An estimated number of chapters remaining.
-    - How we got to this point in the story from the previous chapter.
-    - a summary of chapter events, highlighting any significant events and character developments. Use proper names where applicable.
-    - A growing profile of every significant character mentioned in this chapter, as well as their character arcs.
-    - A description of the setting, both the immediate environment and the larger world.
-    - A growing list of key plot points, and where we are in their progress.
-    - Brief suggestions for where to go in the next chapter and beyond.
+    - A summary of the chapter, highlighting any significant events and character developments.
+    - A description of the current setting, both the immediate environment and the larger world.
+    - A growing catalogue of every significant character still in play. Describe their appearance, personality, character arc, and current status.
+    - A growing catalogue of key plot points, and where we are in their progress.
+    - Brief suggestions for where to go in the next chapter and beyond. If the next chapter should be the final chapter, remark on that.
+
+Again, do not create a checkpoint section if the story has been completed!
 """,
         input=prompt,
         max_output_tokens=4000,
