@@ -1,1 +1,0 @@
-A story about a zombie outbreak occurring at a highschool.

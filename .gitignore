@@ -8,3 +8,5 @@ __pycache__/
 *.wav
 *.mp3
 *.aac
+*.spec.md
+!*.example.spec.md
