@@ -4,7 +4,7 @@ A CLI tool that generates audiobooks using OpenAI APIs.
 
 ## Installation
 
-Adapt commands with your chosen python package manager.
+This is a python project (`pyproject.toml`). Adapt commands with your chosen package manager.
 
 ```bash
 poetry install
