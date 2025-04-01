@@ -15,7 +15,7 @@ load_dotenv()
 # Configure OpenAI API using environment variables
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 LLM_MODEL = os.environ.get("OPENAI_LLM_MODEL", "gpt-4o-mini")
-TTS_MODEL = os.environ.get("OPENAI_TTS_MODEL", "gpt-40-mini-tts")
+TTS_MODEL = os.environ.get("OPENAI_TTS_MODEL", "gpt-4o-mini-tts")
 TTS_VOICE = os.environ.get("OPENAI_TTS_VOICE", "nova")
 
 def load_progress(book_id):
