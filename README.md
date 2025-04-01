@@ -39,7 +39,7 @@ poetry run python audiobook_gen.py <spec_file> [--num-chapters N] [--concat-audi
 
 - `spec_file`: Path to the specification file that describes the story, style, etc.
 
-The book ID is inferred from the spec filename (the name before the first period). For instance, a spec file named `quantum_detective.txt` will use `quantum_detective` as the book ID.
+The book ID is inferred from the spec filename (the name before the first period). For instance, a spec file named `quantum_detective.spec.md` will use `quantum_detective` as the book ID.
 
 ### Optional Arguments
 
