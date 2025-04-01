@@ -77,6 +77,7 @@ def generate_chapter(book_id, spec, progress):
 [checkpoint]
 {progress_text}
 """
+    print("Generating chapter...")
     # Call the OpenAI API to generate the next chapter text.
     response = openai.responses.create(
         model=LLM_MODEL,
@@ -113,6 +114,7 @@ def generate_audio(book_id, chapter_number, chapter_content):
     # Define path for the generated audio file.
     audio_file_path = chapters_dir / f"{book_id}_chapter_{chapter_number}.wav"
     
+    print("Generating audio...")
     # Call OpenAI TTS API to convert chapter text to speech.
     resp = openai.audio.speech.create(
         model=TTS_MODEL,
