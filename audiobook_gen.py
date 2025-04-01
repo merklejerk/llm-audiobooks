@@ -44,7 +44,7 @@ def load_spec(spec_file):
 def extract_sections(response):
     """Extract all tagged sections from the response.
     Returns a dict mapping tag names (lowercase) to their content.
-A tag is defined as: [tag] then content until the next [tag] or the end of the string.
+    A tag is defined as: [tag] then content until the next [tag] or the end of the string.
     """
     sections = {}
     pattern = r"(?i)\[(\w+)\]\s*(.*?)(?=\n*\[\w+\]|$)"
