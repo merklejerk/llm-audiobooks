@@ -6,7 +6,7 @@ A CLI tool that generates audiobooks using OpenAI APIs.
 
 ## 🚀 &nbsp; Installation
 
-This is a python project (`pyproject.toml`), developed with [`poetry`](https://python-poetry.org/), but probably works fine with [`uv`](https://github.com/astral-sh/uv) and possibly others.
+This is a python project developed with [`poetry`](https://python-poetry.org/), I haven't tested it with [`uv`](https://github.com/astral-sh/uv), etc
 
 ```bash
 poetry install

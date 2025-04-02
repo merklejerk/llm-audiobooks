@@ -24,9 +24,23 @@ def load_progress(book_id):
     progress_file = Path(f"progress/{book_id}.json")
     if progress_file.exists():
         with open(progress_file, "r") as f:
-            return json.load(f)
-    # No previous progress file found; return default progress checkpoint
-    return {"last_chapter": "N/A", "checkpoint": "This is the start of the story. We need to write chapter 1."}
+            progress = json.load(f)
+            # Ensure chapter_number exists in older progress files
+            if "chapter_number" not in progress:
+                # Count existing chapter files to determine last chapter number
+                chapters_dir = Path("chapters")
+                if chapters_dir.exists():
+                    text_files = list(chapters_dir.glob(f"{book_id}_chapter_*.md"))
+                    progress["chapter_number"] = len(text_files)
+                else:
+                    progress["chapter_number"] = 0
+            return progress
+     # No previous progress file found; return default progress checkpoint
+    return {
+        "last_chapter": "N/A", 
+        "checkpoint": "This is the start of the story. We need to write chapter 1.",
+        "chapter_number": 0
+    }
 
 def save_progress(book_id, checkpoint):
     """Save the checkpoint to disk."""
@@ -85,13 +99,13 @@ def generate_chapter(book_id, spec, progress):
 You are an expert storyteller AI that creates detailed, engaging book chapters. You will be tasked to write successive chapters of a book.
 For each prompt, you will be given a book specification, the contents of the last chapter you wrote, and a checkpoint summary. You should divide your output into sections, which are begin with a single section tag in the form: `[section name]`. Do not forget the section tags.
 
-You should do the following:
-1. Always generate a `[chapter]` section:
-    - Here you should write the next chapter of the book based on the specification and the last checkpoint. Strive for continuity and coherence with the previous chapters.
-    - At the end of the story, say exactly: `<THE END>`
-2. If the story is NOT complete, generate a `[checkpoint]` section, which should include:
-    - A line stating: "I just wrote Chapter X", where "X" is the chapter number.
-    - An estimated number of chapters remaining.
+ You should do the following:
+ 1. Always generate a `[chapter]` section:
+     - Here you should write the next chapter of the book based on the specification and the last checkpoint. Strive for continuity and coherence with the previous chapters.
+    - When the entire story (not just the chapter) has ended, say exactly: `<THE END>`
+ 2. If the story is NOT complete, generate a `[checkpoint]` section, which should include:
+     - A line stating: "I just wrote Chapter X", where "X" is the chapter number.
+     - An estimated number of chapters remaining.
     - A summary of the chapter, highlighting any significant events and character developments.
     - A description of the current setting, both the immediate environment and the larger world.
     - A growing catalogue of every significant character still in play. Describe their appearance, personality, character arc, and current status.
@@ -199,12 +213,24 @@ def process_chapter(book_id, spec, last_progress):
         print(sections)
         raise ValueError("Chapter content is missing.")
 
+    # Increment chapter number
+    chapter_number = last_progress.get("chapter_number", 0) + 1
+    
     # Check for whether the story is complete.
     if "<the end>" in chapter_content.lower() or not checkpoint:
         print("Story is complete.")
-        progress = {"last_chapter": chapter_content, "checkpoint": "DONE"}
+        progress = {
+            "last_chapter": chapter_content, 
+            "checkpoint": "DONE",
+            "chapter_number": chapter_number
+        }
+        checkpoint = None
     else:
-        progress = {"last_chapter": chapter_content, "checkpoint": checkpoint}
+        progress = {
+            "last_chapter": chapter_content, 
+            "checkpoint": checkpoint,
+            "chapter_number": chapter_number
+        }
         print("\n--- checkpoint ---")
         print(f"Checkpoint: {checkpoint}")
 
@@ -215,16 +241,57 @@ def process_chapter(book_id, spec, last_progress):
     print(chapter_content)
     print("\n==================\n")
 
-    # Determine chapter number by counting existing chapter files.
-    chapter_count = len(list(Path("chapters").glob(f"{book_id}_chapter_*.md")))
-    chapter_number = chapter_count + 1
-    # Generate audio and text files
+    # Generate audio and text files using the progress-tracked chapter number
     audio_file = generate_audio(book_id, chapter_number, chapter_content)
     text_file = save_chapter_text(book_id, chapter_number, chapter_content)
     print(f"Chapter saved to: {text_file}")
     print(f"Audio saved to: {audio_file}")
 
     return None if not checkpoint else progress
+
+def check_audio_exists(book_id, chapter_number):
+    """Check if an audio file exists for the specified chapter."""
+    chapters_dir = Path("chapters")
+    audio_file_path = chapters_dir / f"{book_id}_chapter_{chapter_number}.wav"
+    return audio_file_path.exists()
+
+def ensure_last_chapter_audio(book_id, progress):
+    """
+    Ensure that the audio file for the last chapter exists.
+    If not, generate it before proceeding.
+    """
+    if progress["checkpoint"] == "DONE" or progress["last_chapter"] == "N/A":
+        # No need to check for audio if story is complete or no chapters yet
+        return
+    
+    # Get chapter number from progress
+    chapter_number = progress.get("chapter_number", 0)
+    if chapter_number == 0:
+        # No chapters exist yet
+        return
+    
+    # Check if audio file exists for the last chapter
+    if not check_audio_exists(book_id, chapter_number):
+        print(f"Audio file missing for chapter {chapter_number}. Generating it now...")
+        # Get the last chapter content from the text file
+        last_chapter_file = Path("chapters") / f"{book_id}_chapter_{chapter_number}.md"
+        if last_chapter_file.exists():
+            with open(last_chapter_file, "r") as f:
+                last_chapter_content = f.read()
+            # Generate audio for this chapter
+            generate_audio(book_id, chapter_number, last_chapter_content)
+            print(f"Audio generated for chapter {chapter_number}")
+        else:
+            # If text file doesn't exist but we have content in progress
+            if progress["last_chapter"] != "N/A":
+                print(f"Generating audio using chapter content from progress")
+                generate_audio(book_id, chapter_number, progress["last_chapter"])
+                # Also save the text file for consistency
+                save_chapter_text(book_id, chapter_number, progress["last_chapter"])
+                print(f"Audio generated for chapter {chapter_number}")
+            else:
+                print(f"Warning: Cannot generate audio for chapter {chapter_number}, no content available")
+
 
 def main():
     # Parse command-line arguments for the specification file, number of chapters, and audio concatenation option.
@@ -239,6 +306,9 @@ def main():
     print(f"Using book ID: {book_id}")
     spec = load_spec(args.spec_file)
     progress = load_progress(book_id)
+
+    # Check and generate audio for the last chapter if missing
+    ensure_last_chapter_audio(book_id, progress)
 
     if progress["checkpoint"] == "DONE":
         print("Story is already complete. No further chapters will be generated.")
