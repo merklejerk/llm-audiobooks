@@ -6,10 +6,17 @@ A CLI tool that generates audiobooks using OpenAI APIs.
 
 ## 🚀 &nbsp; Installation
 
-This is a python project (`pyproject.toml`), developed with [`poetry`](https://python-poetry.org/), but probably works fine with [`uv`](https://github.com/astral-sh/uv) and possibly others.
+This is a python project developed with [`poetry`](https://python-poetry.org/), I haven't tested it with [`uv`](https://github.com/astral-sh/uv), etc.
+
+First, install basic deps:
 
 ```bash
 poetry install
+```
+
+Then you will need to manually install `llama-cpp-python`, which seems to be particular for every machine if you want to take advantage of TTS acceleration. For example:
+```bash
+CMAKE_ARGS='-DGGML_VULKAN=on' poetry run pip install --no-cache llama-cpp-python
 ```
 
 ## ⚙️ &nbsp; Configuration

@@ -7,11 +7,15 @@ authors = [
 ]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<4"
 dependencies = [
     "openai (>=1.0.0)",
     "python-dotenv (>=0.19.0)",
     "ffmpeg-python (>=0.2.0,<0.3.0)",
+    "llama-cpp-python (>=0.3.8,<0.4.0)",
+    "orpheus-cpp (>=0.0.2,<0.0.3)",
+    "scipy (>=1.15.2,<2.0.0)",
+    "markdown2 (>=2.5.3,<3.0.0)",
 ]
 
 
