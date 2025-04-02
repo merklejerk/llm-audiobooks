@@ -172,7 +172,7 @@ def generate_audio(book_id, chapter_number, chapter_content):
     batches = []
     current_batch = []
     current_length = 0
-    max_batch_chars = 512  # Character limit per batch
+    max_batch_chars = 768  # Character limit per batch
     
     for sentence in sentences:
         sentence_length = len(sentence)
@@ -207,7 +207,7 @@ def generate_audio(book_id, chapter_number, chapter_content):
         # Generate speech for this batch
         batch_sample_rate, batch_samples = orpheus.tts(
             batch,
-            options={"voice_id": ORPHEUS_VOICE_ID, "max_tokens": 8192, "temperature": 0.5}
+            options={"voice_id": ORPHEUS_VOICE_ID, "max_tokens": 6000, "temperature": 0.6, "min_p": 0.1}
         )
         
         # Store the sample rate (we'll use the last one for consistency)
