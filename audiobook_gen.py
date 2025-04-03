@@ -270,10 +270,9 @@ def main():
     spec = load_spec(args.spec_file)
     progress = load_progress(book_id)
 
-    # If --regen-audio flag is set, generate missing audio and exit.
+    # If --regen-audio flag is set, generate missing audio first.
     if args.regen_audio:
         regen_missing_audio(book_id)
-        return
 
     if progress["checkpoint"] == "DONE":
         print("Story is already complete. No further chapters will be generated.")

@@ -44,8 +44,10 @@ The book ID is inferred from the spec filename (the name before the first period
 
 ### Optional Arguments
 
-- `--num-chapters` or `-n`: Number of successive chapters to generate (default: 1). Each chapter's text and audio will be created sequentially, continuing from the last saved progress.
+- `--num-chapters` or `-n`: Number of successive chapters to generate (default: 1). Each chapter's text and audio will be created sequentially, continuing from the last saved progress. Tip: you can pass `-n 0` to avoid generating any new chapters, in case you want to just perform the audio actions.
 - `--concat-audio` or `-c`: Specifies an output file to concatenate all generated chapter audio files into a single audio file.
+- `--regen-audio` or `-a`: Generate audio for all chapters missing audio files.
+- `--skip-audio` or `-A`: Skip generating audio files.
 
 ### Spec File Format
 
