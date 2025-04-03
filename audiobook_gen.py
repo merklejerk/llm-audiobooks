@@ -205,7 +205,7 @@ def new_chapter(book_id, spec, last_progress, skip_audio=False):
         raise ValueError("Chapter content is missing.")
     chapter_number = last_progress.get("chapter_number", 0) + 1
     new_summaries = (last_progress.get("summaries", "") + f"\n### Chapter {chapter_number} Summary:\n{summary_content}").strip()
-    if "<the end>" in chapter_content.lower() or not checkpoint:
+    if "<the end>" in response.lower() or not checkpoint:
         print("Story is complete.")
         chapter_content = chapter_content.replace("<the end>", "")
         progress = {
