@@ -48,6 +48,7 @@ The book ID is inferred from the spec filename (the name before the first period
 - `--concat-audio` or `-c`: Specifies an output file to concatenate all generated chapter audio files into a single audio file.
 - `--regen-audio` or `-a`: Generate audio for all chapters missing audio files.
 - `--skip-audio` or `-A`: Skip generating audio files.
+- `--speed` or `-s`: Audio speed multiplier for concatenated audio (default: 1.0).
 
 ### Spec File Format
 

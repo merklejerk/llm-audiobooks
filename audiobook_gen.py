@@ -162,7 +162,7 @@ def extract_book_id_from_spec_file(spec_file_path):
     return filename.split('.')[0]  # Split by period and take first part as ID.
 
 # New helper function to concatenate audio files using ffmpeg-python
-def concat_audio_files(book_id, output_file):
+def concat_audio_files(book_id, output_file, speed=1.0):
     # Concatenate all chapter audio files into a single file, with silence filtering.
     chapters_dir = Path("chapters")
     # List and sort audio files based on chapter number.
@@ -185,7 +185,8 @@ def concat_audio_files(book_id, output_file):
                 start_threshold='-30dB',
                 stop_threshold='-30dB',
                 stop_duration=1,
-            ).output(output_file)\
+            ).filter('atempo', speed)\
+            .output(output_file)\
             .overwrite_output()
     
     # Run the command
@@ -262,6 +263,7 @@ def main():
     parser.add_argument("--concat-audio", "-c", type=str, help="Output file to concatenate all generated chapter audio files")
     parser.add_argument("--regen-audio", "-a", action="store_true", help="Generate audio for all chapters missing audio files")
     parser.add_argument("--skip-audio", "-A", action="store_true", help="Skip generating audio files")  # new argument
+    parser.add_argument("--speed", "-s", type=float, default=1.0, help="Audio speed multiplier for concatenated audio (default: 1.0)")
     args = parser.parse_args()
 
     # Extract book ID from the specification filename and load corresponding spec and progress.
@@ -286,7 +288,7 @@ def main():
 
     # If concatenation flag is set, combine generated chapter audio files.
     if args.concat_audio:
-        concat_audio_files(book_id, args.concat_audio)
+        concat_audio_files(book_id, args.concat_audio, speed=args.speed)
 
 if __name__ == "__main__":
     main()
